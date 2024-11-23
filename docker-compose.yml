@@ -1,0 +1,37 @@
+services:
+  mongo:
+    image: mongo:latest # Corrected `mongo-latest` to `mongo:latest`
+    container_name: mongo_container
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - 27017:27017
+
+  server:
+    build: ./Node-back
+    container_name: server_container
+    ports:
+      - 5001:5001
+    depends_on:
+      - mongo
+    volumes:
+      - ./Node-back:/app
+      - /Node-back/node_modules
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/UserData
+
+  client:
+    build: ./my-react-app
+    container_name: client_container
+    ports:
+      - 5173:5173
+    depends_on:
+      - server
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./my-react-app:/app
+      - /my-react-app/node_modules
+
+volumes:
+  mongo_data:
